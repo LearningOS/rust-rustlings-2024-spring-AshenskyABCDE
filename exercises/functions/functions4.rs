@@ -20,7 +20,6 @@ fn sale_price(price: i32) -> i32{
     } else {
         price - 3
     }
-    return price
 }
 
 fn is_even(num: i32) -> bool {
