@@ -1,23 +1,39 @@
-// tests4.rs
+// tests5.rs
 //
-// Make sure that we're testing for the correct conditions!
+// An `unsafe` in Rust serves as a contract.
 //
-// Execute `rustlings hint tests4` or use the `hint` watch subcommand for a
+// When `unsafe` is marked on an item declaration, such as a function,
+// a trait or so on, it declares a contract alongside it. However,
+// the content of the contract cannot be expressed only by a single keyword.
+// Hence, its your responsibility to manually state it in the `# Safety`
+// section of your documentation comment on the item.
+//
+// When `unsafe` is marked on a code block enclosed by curly braces,
+// it declares an observance of some contract, such as the validity of some
+// pointer parameter, the ownership of some memory address. However, like
+// the text above, you still need to state how the contract is observed in
+// the comment on the code block.
+//
+// NOTE: All the comments are for the readability and the maintainability of
+// your code, while the Rust compiler hands its trust of soundness of your
+// code to yourself! If you cannot prove the memory safety and soundness of
+// your own code, take a step back and use safe code instead!
+//
+// Execute `rustlings hint tests5` or use the `hint` watch subcommand for a
+// hint.
 
+// 
 
-
-struct Rectangle {
-    width: i32,
-    height: i32
-}
-
-impl Rectangle {
-    // Only change the test functions themselves
-    pub fn new(width: i32, height: i32) -> Self {
-        if width <= 0 || height <= 0 {
-            panic!("Rectangle width and height cannot be negative!")
-        }
-        Rectangle {width, height}
+/// # Safety
+///
+/// The `address` must contain a mutable reference to a valid `u32` value.
+unsafe fn modify_by_address(address: usize) {
+    // SAFETY: The caller must guarantee that the `address` is a valid 
+    // mutable reference to a `u32` value. Dereferencing an invalid 
+    // address or an address that doesn't point to a `u32` is undefined behavior.
+    unsafe {
+        let ptr = address as *mut u32;
+        *ptr = 0xAABBCCDD;
     }
 }
 
@@ -26,24 +42,11 @@ mod tests {
     use super::*;
 
     #[test]
-    fn correct_width_and_height() {
-        // This test should check if the rectangle is the size that we pass into its constructor
-        let rect = Rectangle::new(10, 20);
-        assert_eq!(rect.width, 10); // check width
-        assert_eq!(rect.height, 20); // check height
-    }
-
-    #[test]
-    #[should_panic]
-    fn negative_width() {
-        // This test should check if program panics when we try to create rectangle with negative width
-        let _rect = Rectangle::new(-10, 10);
-    }
-
-    #[test]
-    #[should_panic]
-    fn negative_height() {
-        // This test should check if program panics when we try to create rectangle with negative height
-        let _rect = Rectangle::new(10, -10);
+    fn test_success() {
+        let mut t: u32 = 0x12345678;
+        // SAFETY: The address is guaranteed to be valid and contains
+        // a unique reference to a `u32` local variable.
+        unsafe { modify_by_address(&mut t as *mut u32 as usize) };
+        assert!(t == 0xAABBCCDD);
     }
 }
