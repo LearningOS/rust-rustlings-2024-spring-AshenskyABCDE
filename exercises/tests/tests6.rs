@@ -40,5 +40,5 @@ mod tests {
 
         assert!(ptr_1 == ptr_2);
         assert!(ret.b == Some("hello".to_owned()));
-    }
+    } //
 }
